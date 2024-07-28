@@ -1,0 +1,76 @@
+#!/bin/bash
+
+set -x
+
+wipe_nvme () {
+  nvme format --ses=1 --force $1
+  RC=$?
+  if [ $RC -eq 0 ]; then
+    return 0
+  fi
+
+  systemctl suspend -i
+
+  nvme format --ses=1 --force $1
+  RC=$?
+  if [ $RC -eq 0 ]; then
+    return 0
+  fi
+
+  return $RC
+}
+
+wipe_ata () {
+  hdparm --user-master u --security-set-pass schule $1
+  hdparm --user-master u --security-erase schule $1
+  RC=$?
+  if [ $RC -eq 0 ]; then
+    return 0
+  fi
+
+  systemctl suspend -i
+
+  hdparm --user-master u --security-set-pass schule $1
+  hdparm --user-master u --security-erase schule $1
+  RC=$?
+  if [ $RC -eq 0 ]; then
+    return 0
+  fi
+
+  return $RC
+}
+
+wipe_nwipe () {  
+  nwipe -m random --nogui --verify=off --autonuke "$1"
+
+  if [ $? -ne 0 ]; then
+    exit 1
+  fi
+}
+
+check_all_zero () {
+  nwipe -m verify_zero --nogui --autonuke "$1"
+
+  if [ $? -ne 0 ]; then
+    exit 1
+  fi
+}
+
+main () {
+  case "$BOOT_DEVICE" in 
+    *nvme*)
+      wipe_nvme $BOOT_DEVICE;; 
+    *)
+      wipe_ata $BOOT_DEVICE;;
+  esac
+  RC=$?
+
+  # fallback
+  if [ $RC -ne 0 ]; then
+    wipe_nwipe $BOOT_DEVICE
+  fi
+
+  check_all_zero $BOOT_DEVICE
+}
+
+main
