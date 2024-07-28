@@ -21,8 +21,7 @@ wipe_nvme () {
 }
 
 wipe_ata () {
-  hdparm --user-master u --security-set-pass schule $1
-  hdparm --user-master u --security-erase schule $1
+  ata-secure-erase.sh $1
   RC=$?
   if [ $RC -eq 0 ]; then
     return 0
@@ -30,8 +29,7 @@ wipe_ata () {
 
   systemctl suspend -i
 
-  hdparm --user-master u --security-set-pass schule $1
-  hdparm --user-master u --security-erase schule $1
+  ata-secure-erase.sh $1
   RC=$?
   if [ $RC -eq 0 ]; then
     return 0
