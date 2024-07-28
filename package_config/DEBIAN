@@ -10,6 +10,7 @@ rsync
 openssh-client openssh-server
 time
 procinfo
+eject
 nullmailer
 sudo
 locales
@@ -21,6 +22,7 @@ PACKAGES install NONFREE
 # you may want these non-free kernel drivers
 firmware-bnx2 firmware-bnx2x firmware-realtek
 firmware-linux-nonfree
+firmware-intel-sound
 # a list of firmware for wifi/wireless
 firmware-misc-nonfree
 atmel-firmware firmware-ath9k-htc firmware-brcm80211

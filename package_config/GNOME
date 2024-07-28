@@ -1,3 +1,7 @@
+PACKAGES install
+education-workstation
+education-desktop-gnome
+gdm3
 # enable following two lines to get full GNOME desktop
 #PACKAGES install
 #task-gnome-desktop

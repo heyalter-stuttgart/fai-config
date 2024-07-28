@@ -1,0 +1,8 @@
+PACKAGES install
+education-networked
+debian-edu-config
+debian-edu-artwork
+debian-edu-install
+cfengine3
+wget
+systemd-timesyncd
