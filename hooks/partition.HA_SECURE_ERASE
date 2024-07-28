@@ -40,8 +40,28 @@ wipe_ata () {
   return $RC
 }
 
+fast_wipe_all () {
+  DISKDEV_FAILED_LIST=""
+  for d in $disklist
+  do
+    case "$d" in 
+      *nvme*)
+        wipe_nvme /dev/$d;; 
+      *)
+        wipe_ata /dev/$d;;
+    esac
+    RC=$?
+
+    if [ $RC -eq 0 ]; then
+      continue
+    fi
+
+    DISKDEV_FAILED_LIST="$DISKDEV_FAILED_LIST /dev/$d"
+  done
+}
+
 wipe_nwipe () {  
-  nwipe -m random --nogui --verify=off --autonuke "$1"
+  nwipe -m random --nogui --verify=off --autonuke --nousb "$@"
 
   if [ $? -ne 0 ]; then
     exit 1
@@ -49,7 +69,7 @@ wipe_nwipe () {
 }
 
 check_all_zero () {
-  nwipe -m verify_zero --nogui --autonuke "$1"
+  nwipe -m verify_zero --nogui --autonuke --nousb
 
   if [ $? -ne 0 ]; then
     exit 1
@@ -57,20 +77,14 @@ check_all_zero () {
 }
 
 main () {
-  case "$BOOT_DEVICE" in 
-    *nvme*)
-      wipe_nvme $BOOT_DEVICE;; 
-    *)
-      wipe_ata $BOOT_DEVICE;;
-  esac
-  RC=$?
+  fast_wipe_all
 
   # fallback
-  if [ $RC -ne 0 ]; then
-    wipe_nwipe $BOOT_DEVICE
+  if [ -n "$DISKDEV_FAILED_LIST" ]; then
+    wipe_nwipe $DISKDEV_FAILED_LIST
   fi
 
-  check_all_zero $BOOT_DEVICE
+  check_all_zero
 }
 
 main
