@@ -21,7 +21,7 @@ wipe_nvme () {
 }
 
 wipe_ata () {
-  ata-secure-erase.sh $1
+  ata-secure-erase.sh -f $1
   RC=$?
   if [ $RC -eq 0 ]; then
     return 0
@@ -29,7 +29,7 @@ wipe_ata () {
 
   systemctl suspend -i
 
-  ata-secure-erase.sh $1
+  ata-secure-erase.sh -f $1
   RC=$?
   if [ $RC -eq 0 ]; then
     return 0
