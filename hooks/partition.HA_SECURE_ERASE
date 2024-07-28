@@ -74,7 +74,7 @@ check_all_zero () {
 }
 
 main () {
-  if [ -n "$disklist" ]; then
+  if [ -z "$disklist" ]; then
     read -rsp $'disklist empty' -n 1 -t 120;
     systemctl poweroff
   fi
