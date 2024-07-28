@@ -62,21 +62,23 @@ fast_wipe_all () {
 
 wipe_nwipe () {  
   nwipe -m random --nogui --verify=off --autonuke --nousb "$@"
-
-  if [ $? -ne 0 ]; then
-    exit 1
-  fi
 }
 
 check_all_zero () {
   nwipe -m verify_zero --nogui --autonuke --nousb
 
   if [ $? -ne 0 ]; then
-    exit 1
+    read -rsp $'zero-verification not successfull!\n' -n 1 -t 120;
+    systemctl poweroff
   fi
 }
 
 main () {
+  if [ -n "$disklist" ]; then
+    read -rsp $'disklist empty' -n 1 -t 120;
+    systemctl poweroff
+  fi
+
   fast_wipe_all
 
   # fallback
